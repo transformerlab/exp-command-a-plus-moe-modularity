@@ -1,0 +1,28 @@
+{
+  "_description": "Hardened causal-modularity verdict for Command A+ — the decisive run. Per-family expert ablation vs a size-16 random-expert null, scored as per-token NLL on an INDEPENDENT corpus (Wikipedia, distinct from the routing-probe/Belebele corpus); capabilities via teacher-forced solution NLL. Bootstrap 95% CIs. This is Table 1 of the paper.",
+  "job_id": "1f061675-addb-455b-9703-3bc16f0c74d3",
+  "experiment": "autoresearch-theta-modularity-20260612",
+  "model": "CohereLabs/command-a-plus-05-2026-w4a4",
+  "ablation": "router-mask + gate renormalization (16/128 experts), inference-time only",
+  "n_per_axis": {"language": 120, "math": 80, "code": 120, "general": 150},
+  "n_random_null": 10,
+  "n_bootstrap": 2000,
+  "decision_rules": {
+    "point": "on-target effect > random null (mean+2sigma) AND worst within-domain off-target <= on-target/3",
+    "conservative_CI": "lower 95% CI of on-target > null(mean+2sigma) AND upper 95% CI of worst off-target <= (lower 95% CI of on-target)/3"
+  },
+  "metric": "per-item NLL increase (nats/token) on the family's own axis; off-target = within-domain other axes",
+  "verdict": {
+    "ar":      {"domain": "lang", "on_target": 1.80, "on_target_CI": [1.73, 1.86], "null_mean_plus_2sigma": 0.64, "worst_off_target": 0.43, "worst_off_axis": "en", "point_rule_modular": true,  "ci_rule_modular": true,  "note": "robust module across corpus, metric, and CIs"},
+    "es":      {"domain": "lang", "on_target": 1.29, "on_target_CI": [1.23, 1.36], "null_mean_plus_2sigma": 0.58, "worst_off_target": 0.43, "worst_off_axis": "ar", "point_rule_modular": true,  "ci_rule_modular": false, "note": "corpus-dependent: bleeds into Arabic on Wikipedia (es/ar overlap in only 2 of 16 experts {30,86}, Jaccard 0.067; mechanism not isolated); knife-edge (passes point rule by 0.002)"},
+    "zh":      {"domain": "lang", "on_target": 0.63, "on_target_CI": [0.59, 0.67], "null_mean_plus_2sigma": 0.42, "worst_off_target": 0.37, "worst_off_axis": "en", "point_rule_modular": false, "ci_rule_modular": false, "note": "weak on-target, not selective"},
+    "math":    {"domain": "cap",  "on_target": 0.37, "on_target_CI": [0.33, 0.41], "null_mean_plus_2sigma": 0.15, "worst_off_target": 0.08, "worst_off_axis": "general", "point_rule_modular": true,  "ci_rule_modular": false, "note": "metric-dependent: entangled with general reasoning under task accuracy; selectivity does not survive CIs"},
+    "code":    {"domain": "cap",  "on_target": 0.49, "on_target_CI": [0.39, 0.61], "null_mean_plus_2sigma": 0.08, "worst_off_target": 0.17, "worst_off_axis": "math", "point_rule_modular": false, "ci_rule_modular": false, "note": "real effect but entangled (bleeds into math); fails point rule by 0.009"},
+    "general": {"domain": "cap",  "on_target": 0.10, "on_target_CI": [0.05, 0.16], "null_mean_plus_2sigma": 0.19, "worst_off_target": null, "worst_off_axis": null, "point_rule_modular": false, "ci_rule_modular": false, "note": "does not beat its own null"}
+  },
+  "summary": {
+    "modular_conservative_CI": "1/6 (ar)",
+    "modular_point_rule": "3/6 (ar, es, math); count threshold-sensitive: es passes selectivity by 0.002, code (rejected) fails by 0.009; ar and math clear comfortably",
+    "headline": "Robust functional modularity is rare and measurement-dependent; only the Arabic family survives across corpus, metric, and a conservative statistical bar."
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "_description": "Quantization-confound check: the identical consolidation ablations re-run on the UN-QUANTIZED bf16 base model (CohereLabs/command-a-plus-05-2026), to test whether the W4A4 negative finding is a 4-bit artifact. It is not — the verdict reproduces. Compare against consolidation_verdict.json (W4A4).",
+  "job_id": "3ccba554-14ec-4361-b685-775cc446b06c",
+  "model": "CohereLabs/command-a-plus-05-2026 (un-quantized base)",
+  "precision": "bfloat16",
+  "hardware": "8x A100-80GB (Lambda), tensor_parallel_size=8",
+  "masking_note": "Under TP=8 the model forward runs in 8 worker processes; the ablation mask is installed in each worker via vLLM collective_rpc (a driver-only monkeypatch is a silent no-op under tensor parallelism). Smoke gate verified: per-worker mask_calls=256, Arabic noop->masked NLL delta=1.81.",
+  "metric": "per-item NLL increase (nats/token), independent Wikipedia corpus + solution-NLL; bootstrap 95% CIs; same rules as the W4A4 run",
+  "verdict": {
+    "ar":      {"domain": "lang", "on_target": 1.8104, "on_target_CI": [1.7409, 1.8796], "null_mean_plus_2sigma": 0.6945, "worst_off_target": 0.4654, "worst_off_axis": "en", "ci_rule_modular": true,  "w4a4_on_target": 1.80, "note": "MODULAR in both precisions; effect within 0.01 of W4A4"},
+    "zh":      {"domain": "lang", "on_target": 0.6514, "on_target_CI": [0.6122, 0.6904], "null_mean_plus_2sigma": 0.4498, "worst_off_target": 0.3999, "worst_off_axis": "en", "ci_rule_modular": false, "w4a4_on_target": 0.63, "note": "non-selective in both"},
+    "es":      {"domain": "lang", "on_target": 1.298,  "on_target_CI": [1.2394, 1.3594], "null_mean_plus_2sigma": 0.6112, "worst_off_target": 0.4481, "worst_off_axis": "ar", "ci_rule_modular": false, "w4a4_on_target": 1.29, "note": "knife-edge: point-rule selectivity flips to FAIL by 0.015 (W4A4 passed by 0.002) -> sits exactly on the boundary"},
+    "math":    {"domain": "cap",  "on_target": 0.3992, "on_target_CI": [0.363, 0.4361],  "null_mean_plus_2sigma": 0.1622, "worst_off_target": 0.0868, "worst_off_axis": "general", "ci_rule_modular": false, "w4a4_on_target": 0.37, "note": "non-selective under CI in both"},
+    "code":    {"domain": "cap",  "on_target": 0.4386, "on_target_CI": [0.3348, 0.5503], "null_mean_plus_2sigma": 0.0791, "worst_off_target": 0.1705, "worst_off_axis": "math", "ci_rule_modular": false, "w4a4_on_target": 0.49, "note": "non-selective in both"},
+    "general": {"domain": "cap",  "on_target": 0.0891, "on_target_CI": [0.0427, 0.1351], "null_mean_plus_2sigma": 0.2173, "worst_off_target": 0.0785, "worst_off_axis": "math", "ci_rule_modular": false, "w4a4_on_target": 0.10, "note": "does not beat null in both"}
+  },
+  "summary": {
+    "modular_conservative_CI": "1/6 (ar) — IDENTICAL to W4A4",
+    "conclusion": "The negative finding (only Arabic robustly modular; modularity mostly dissolves) reproduces at full precision. It is a property of the model, not a quantization artifact. The only family to move across precisions is the knife-edge es, which flips point-rule selectivity by a hair — reinforcing the measurement-fragility thesis."
+  }
+}

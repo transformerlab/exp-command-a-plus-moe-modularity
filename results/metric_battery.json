@@ -1,0 +1,55 @@
+{
+  "_description": "The same six families tested under multiple metrics — the evidence that apparent modularity is measurement-dependent. Each pass is a causal ablation vs a size-16 random null. 'modular' verdicts are point-rule unless noted; the consolidation run (independent corpus + CIs) is authoritative (see consolidation_verdict.json).",
+  "experiment": "autoresearch-theta-modularity-20260612",
+  "model": "CohereLabs/command-a-plus-05-2026-w4a4",
+  "passes": {
+    "capability_accuracy": {
+      "job": "e6a67e68", "metric": "task accuracy (MATH-500, HumanEval, MMLU-Pro)",
+      "math": {"on_target_drop": 0.16, "off_target": {"general": 0.11}, "null_mean_plus_2sigma": 0.062, "selective": false, "note": "entangled with general reasoning"},
+      "code": {"on_target_drop": 0.00, "selective": null, "note": "no detectable accuracy effect (n=60, single seed; underpowered to separate redundancy from a small real effect)"},
+      "general": {"on_target_drop": 0.075, "null_mean_plus_2sigma": 0.105, "selective": null, "note": "within null"},
+      "shared_core_dose_MMLU": {"K8": 0.05, "K16": 0.04, "K24": 0.08, "K32": 0.11, "note": "graceful, redundant, no cliff"},
+      "modular": "0/3"
+    },
+    "capability_problem_nll": {
+      "job": "11cbdd93", "metric": "NLL on problem text (domain-familiarity control)",
+      "math": {"on_target": 0.30, "worst_off": 0.11, "selective": false},
+      "code": {"on_target": 1.29, "worst_off": {"math": 0.62, "general": 0.48}, "selective": false, "note": "largest effect of any capability, but entangled; the 0.00 accuracy result (n=60, underpowered) does not mean the experts are idle — they clearly process code text"},
+      "general": {"on_target": 0.10, "worst_off": 0.22, "selective": false},
+      "modular": "0/3",
+      "purpose": "metric-confound control: under the same NLL metric as languages, capabilities are still 0/3 selective -> the lang-vs-cap dissociation is not an accuracy-vs-NLL artifact"
+    },
+    "capability_solution_nll": {
+      "job": "d3e27498", "metric": "teacher-forced NLL on the gold solution (capability-faithful)",
+      "math": {"on_target": 0.34, "worst_off": 0.057, "selective_point": true, "note": "point-modular here; does NOT survive CIs in the consolidation run"},
+      "code": {"on_target": 0.22, "worst_off": 0.083, "selective_point": false, "note": "nearly selective"},
+      "general": {"on_target": 0.03, "selective": false, "note": "within (noisy) null"},
+      "modular_point": "1/3 (math)"
+    },
+    "language_belebele_accuracy": {
+      "job": "6969d6da", "metric": "Belebele multiple-choice accuracy",
+      "result": "0/3", "note": "near-ceiling (0.89-0.96), random null ~0 -> low power / uninformative null"
+    },
+    "language_flores_nll": {
+      "job": "eb4eb07a", "metric": "NLL on FLoRes-200 passages (reached via Belebele, which is built on them)",
+      "ar": {"on_target": 1.54, "selective_point": true},
+      "es": {"on_target": 1.76, "selective_point": true},
+      "zh": {"on_target": 0.41, "selective_point": false},
+      "modular_point": "2/3 (ar, es)",
+      "note": "language corpus #1; es modularity here is overturned on the independent Wikipedia corpus (corpus #2), which is the corpus-dependence finding"
+    },
+    "consolidation_independent_corpus_CI": {
+      "job": "1f061675", "metric": "NLL on Wikipedia (independent) + bootstrap CIs",
+      "see": "consolidation_verdict.json",
+      "modular_CI": "1/6 (ar)", "modular_point": "3/6 (ar, es, math)"
+    }
+  },
+  "fragility_summary": {
+    "ar": "modular across NLL metrics and the independent corpus -> robust",
+    "es": "modular on FLoRes-200 passages, NOT on independent Wikipedia (corpus-dependent)",
+    "math": "entangled under accuracy, selective under solution-NLL point, not under CIs (metric/statistics-dependent)",
+    "code": "no detectable accuracy effect (n=60, underpowered), large but entangled under NLL (metric-dependent)",
+    "zh": "never selective",
+    "general": "never beats null"
+  }
+}
