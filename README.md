@@ -5,7 +5,7 @@ Data and reproducibility artifacts for the paper:
 > **How Modular Is a Frontier Mixture-of-Experts? A Pre-registered Causal Test in Which
 > Apparent Expert Modularity Mostly Dissolves**
 > Tony Salomone, Deep Gandhi, Ali Asaria — Transformer Lab.
-> arXiv: _[link to be added on posting]_
+> arXiv: https://arxiv.org/abs/2606.25092
 
 ## TL;DR
 
@@ -77,7 +77,17 @@ logs are retained by the authors and available on request.
 
 ## Citation
 
-_BibTeX to be added once the arXiv ID is assigned._
+```bibtex
+@misc{salomone2026modular,
+  title         = {How Modular Is a Frontier Mixture-of-Experts? A Pre-registered Causal Test in Which Apparent Expert Modularity Mostly Dissolves},
+  author        = {Salomone, Tony and Gandhi, Deep and Asaria, Ali},
+  year          = {2026},
+  eprint        = {2606.25092},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+  url           = {https://arxiv.org/abs/2606.25092}
+}
+```
 
 ## License
 
